@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}FitTrack{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+{% if user.is_authenticated %}
+<div class="app-shell">
+  <aside class="sidebar">
+    <a class="brand" href="{% url 'dashboard' %}"><span class="brand-mark"><i data-lucide="activity"></i></span><span>fit<span class="brand-accent">track</span></span></a>
+    <div class="side-label">WORKSPACE</div>
+    <nav>
+      <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+      <a href="{% url 'workouts' %}" class="{% if 'workout' in request.resolver_match.url_name %}active{% endif %}"><i data-lucide="dumbbell"></i> Workouts</a>
+      <a href="{% url 'meals' %}" class="{% if 'meal' in request.resolver_match.url_name %}active{% endif %}"><i data-lucide="utensils"></i> Nutrition</a>
+      <a href="{% url 'goals' %}" class="{% if 'goal' in request.resolver_match.url_name %}active{% endif %}"><i data-lucide="target"></i> My goals</a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="coach-card"><div class="coach-icon"><i data-lucide="sparkles"></i></div><b>Consistency is key</b><p>Little progress each day adds up to big results.</p></div>
+      <div class="user-mini"><div class="avatar">{{ user.username|first|upper }}</div><div class="user-meta"><b>{{ user.get_full_name|default:user.username }}</b><small>FitTrack member</small></div><form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="icon-btn" title="Log out"><i data-lucide="log-out"></i></button></form></div>
+    </div>
+  </aside>
+  <main class="main-area">
+    <header class="topbar"><div class="mobile-brand">fit<span>track</span></div><div class="breadcrumb">Workspace <span>/</span> {% block breadcrumb %}Overview{% endblock %}</div><div class="top-actions"><span class="today-pill"><i data-lucide="calendar-days"></i> {% now "D, d M Y" %}</span><div class="avatar small">{{ user.username|first|upper }}</div></div></header>
+    {% if messages %}<div class="messages">{% for message in messages %}<div class="message {{ message.tags }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+    <section class="page-content">{% block content %}{% endblock %}</section>
+  </main>
+</div>
+{% else %}
+{% if messages %}<div class="messages public-messages">{% for message in messages %}<div class="message {{ message.tags }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+{% block public_content %}{% endblock %}
+{% endif %}
+<script>if(window.lucide){lucide.createIcons();}</script>
+{% block scripts %}{% endblock %}
+</body></html>
